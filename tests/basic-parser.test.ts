@@ -4,6 +4,7 @@ import * as path from "path";
 const PEOPLE_CSV_PATH = path.join(__dirname, "../data/people.csv");
 const EXAMS_CSV_PATH = path.join(__dirname, "../data/exams.csv");
 const QUOTES_CSV_PATH = path.join(__dirname, "../data/quotes.csv");
+const NUMBERS_CSV_PATH = path.join(__dirname, "../data/numbers.csv");
 
 test("parseCSV yields arrays", async () => {
   const results = await parseCSV(PEOPLE_CSV_PATH)
@@ -32,7 +33,18 @@ test("parseCSV splits csv data properly", async () => {
   expect(results[1][1]).toEqual("23");
 })
 
-test("parseCSV can successfully parse csvs with empty columns", async () => {
+test("parseCSV can parse csvs with missing columns (no ,,)", async () => {
+  const results = await parseCSV(NUMBERS_CSV_PATH);
+  
+  expect(results[0]).toEqual(["1", ""]);
+  expect(results[1]).toEqual(["2,", "4.23"]);
+  expect(results[2]).toEqual(["10", ""]); // what would i expect?
+  expect(results[3]).toEqual(["1.0", ""]); // what would i expect?
+
+
+})
+
+test("parseCSV can successfully parse csvs with empty columns (with ,,)", async () => {
   const results = await parseCSV(EXAMS_CSV_PATH)
 
   expect(results).toHaveLength(6);
@@ -51,7 +63,7 @@ test("parseCSV can successfully parse csvs with empty columns", async () => {
 
   expect(results[4][0]).toEqual("Ronald Duke");
   expect(results[4][1]).toEqual("");
-  expect(results[4][2]).toEqual("95");
+  expect(results[4][2]).toEqual("");
 
   expect(results[5][0]).toEqual("Rey Olson");
   expect(results[5][1]).toEqual("B");
