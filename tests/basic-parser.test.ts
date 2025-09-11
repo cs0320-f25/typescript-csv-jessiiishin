@@ -5,6 +5,7 @@ const PEOPLE_CSV_PATH = path.join(__dirname, "../data/people.csv");
 const EXAMS_CSV_PATH = path.join(__dirname, "../data/exams.csv");
 const QUOTES_CSV_PATH = path.join(__dirname, "../data/quotes.csv");
 const NUMBERS_CSV_PATH = path.join(__dirname, "../data/numbers.csv");
+const SONGS_CSV_PATH = path.join(__dirname, "../data/songs.csv");
 
 test("parseCSV yields arrays", async () => {
   const results = await parseCSV(PEOPLE_CSV_PATH)
@@ -40,7 +41,15 @@ test("parseCSV can parse csvs with missing columns (no ,,)", async () => {
   expect(results[1]).toEqual(["2,", "4.23"]);
   expect(results[2]).toEqual(["10", ""]); // what would i expect?
   expect(results[3]).toEqual(["1.0", ""]); // what would i expect?
+})
 
+test("parseCSV quotation errors test", async () => {
+  const results = await parseCSV(SONGS_CSV_PATH);
+  expect(results[0][0]).toEqual("aespa");
+  expect(results[0][1]).toEqual("i said \"mom, i am a rich man!\" imma carry myself"); // what do i expect??
+  expect(results[1][0]).toEqual("FIFTY FIFTY");
+  expect(results[2][1]).toEqual("0:01 \"i trip and fall\" in love");
+  expect(results[3][1]).toEqual("0:37 'you push and pull me like gravity'");
 
 })
 
