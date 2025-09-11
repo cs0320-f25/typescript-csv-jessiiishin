@@ -23,6 +23,15 @@ test("parseCSV yields only arrays", async () => {
   }
 });
 
+test("parseCSV splits csv data properly", async () => {
+  const results = await parseCSV(PEOPLE_CSV_PATH)
+
+  expect(results[0][0]).toEqual("name");
+  expect(results[0][1]).toEqual("age");
+  expect(results[1][0]).toEqual("Alice");
+  expect(results[1][1]).toEqual("23");
+})
+
 test("parseCSV can successfully parse csvs with empty columns", async () => {
   const results = await parseCSV(EXAMS_CSV_PATH)
 
@@ -48,8 +57,6 @@ test("parseCSV can successfully parse csvs with empty columns", async () => {
   expect(results[5][1]).toEqual("B");
   expect(results[5][2]).toEqual("90");
 });
-
-test("parseCSV ")
 
 test("parseCSV groups strings that are wrapped with quotations", async () => {
   const results = await parseCSV(QUOTES_CSV_PATH)
