@@ -39,19 +39,15 @@
     Extensions
     1. Streaming mode (parse line by line instead of files?)
     2. Infer types from fields
-    3. Validation (let users supply a schema or validator to check each row) ?
+    3. Validation (let users supply a schema or validator to check each row)
     4. Error handling with bad input
-    5. Async support (read from files, network streams, or in-browser File objects) ?
+    5. Async support (read from files, network streams, or in-browser File objects)
     6. Allow devs to specify type of parsed object
     7. Have a config object that exposes options
     8. Error reporting
     9. Export & parse (CSV -> JSON, JSON -> CSV)
-    10. Multi character delimiters??
-    11. Locale aware parsing (1.234,56 vs 1,234.56)??
-
-    It seemed like it gave me usually the same answers just rephrased. The more detailed instructions I provided, the more suggestions it returned. Sometimes it gave me steps to write the CSV parser even though I didn't ask for it.
-
-    Some of its suggestions overlapped with my initial thoughts, like the quoting rules or delimiters. 
+    10. Multi character delimiters
+    11. Locale aware parsing (1.234,56 vs 1,234.56)
 
 - #### Step 3: use an LLM to help expand your perspective.
 
@@ -65,15 +61,15 @@
             - The CSV parser does not split on the delimiter if it's wrapped in double quotations (or whatever that indicates that the content is grouped)
             - The CSV parser correctly handles ncludes escape double quotations (quotations in the middle of quotations like "something "more" and more")
     
-    2. **Type Inference / Config:** (extension)
+    2. **Type Config:** (extension)
         From LLM and me.
         
         As a user, I am able to specify what type of data each column should contain and have the parser return the data in that type, so that I can validate the data and not worry about typecasting later while using it.
 
         Acceptance Criteria:
-            - CSV parser infers types from column data.
             - User can specify what data type each column contains.
             - Parser will validate the type and report if something does not align (connects to #3)
+            - Parser will turn the data into the type if possible.
 
     3. **Error & Bad Input Handling:** (extension)
         From LLM and me.
@@ -85,7 +81,7 @@
             - The CSV parser parses incomplete CSV files properly by putting "" (or something else like undefined) in place of missing columns.
 
     4. **Delimiter Flexibility:** (extension)
-        From LLM.
+        From LLM (gave me the keyword).
 
         As a user, I am able to parse CSV files that do not use "," as the delimiter, meaning I do not have to manually change the delimiters of my CSV files to use the parser. I am able to efficiently work with many different CSV files. 
 
@@ -93,9 +89,11 @@
             - The CSV parser receives what delimiter it should split by and splits CSV file's data accordingly.
             - The CSV parser does not break when using a different delimiter.
 
-    
-
     Include your notes from above: what were your initial ideas, what did the LLM suggest, and how did the results differ by prompt? What resonated with you, and what didn’t? (3-5 sentences.) 
+
+    My initial ideas were basically quotation rules (1), type inference and specification (2), handling bad inputs (3), and validation of data types (2). The LLM suggested a whole bunch of ideas (listed in step 2). The more detailed instructions I provided, the more suggestions it returned. Many of the suggestions were the same across the different sessions, and the clarifying questions were always the same but rephrased in different ways.
+
+    I resonated with the ones that I also came up with and the ones catching edge cases like handling line endings. I did not resonate with ones like multi-character delimiters or inferring types from the data without 
 
 ### Design Choices
 
