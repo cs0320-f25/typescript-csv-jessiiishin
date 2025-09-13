@@ -89,30 +89,38 @@
             - The CSV parser receives what delimiter it should split by and splits CSV file's data accordingly.
             - The CSV parser does not break when using a different delimiter.
 
-    Include your notes from above: what were your initial ideas, what did the LLM suggest, and how did the results differ by prompt? What resonated with you, and what didn’t? (3-5 sentences.) 
-
     My initial ideas were basically quotation rules (1), type inference and specification (2), handling bad inputs (3), and validation of data types (2). The LLM suggested a whole bunch of ideas (listed in step 2). The more detailed instructions I provided, the more suggestions it returned. Many of the suggestions were the same across the different sessions, and the clarifying questions were always the same but rephrased in different ways.
 
     I resonated with the ones that I also came up with and the ones catching edge cases like handling line endings. I did not resonate with ones like multi-character delimiters or inferring types from the data without 
 
 ### Design Choices
+    I made parserCSV accept the schema and validate the rows if the schema is not undefined. If the schema is undefined, the function will parse 
 
 ### 1340 Supplement
+    N/A
 
 - #### 1. Correctness
-
+    In my opinion, CSV parsers are correct if they:
+        return what is in the CSV file without false omission or alteration
+        split up data on the delimiter
+        handle data that's grouped in double quotations (or other notation)
+        handle errors gracefully and report them to users clearly
+        
 - #### 2. Random, On-Demand Generation
+    I think this would help test more rapidly and thoroughly if configured correctly. 
 
 - #### 3. Overall experience, Bugs encountered and resolved
 #### Errors/Bugs:
+    Setting the return type with T[] caused the results to potentially be unknown, which hindered testing and making the 
 #### Tests:
 #### How To…
 
 #### Team members and contributions (include cs logins):
-
+    N/A
 #### Collaborators (cslogins of anyone you worked with on this project and/or generative AI):
     ChatGPT for Task B & C. I asked it to explain generics and ways to use it to supplement the reading to recall last year's learning better. I also used it for base level brainstorming for coming up with ways to alert the user of errors without using the console logs.
 
 #### Total estimated time it took to complete project:
-    5 hours
+    7 hours
 #### Link to GitHub Repo:  
+    https://github.com/cs0320-f25/typescript-csv-jessiiishin

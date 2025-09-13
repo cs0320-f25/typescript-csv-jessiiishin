@@ -1,5 +1,6 @@
 import { parseCSV } from "../src/basic-parser";
 import * as path from "path";
+import z from "zod";
 
 const PEOPLE_CSV_PATH = path.join(__dirname, "../data/people.csv");
 const EXAMS_CSV_PATH = path.join(__dirname, "../data/exams.csv");
@@ -8,7 +9,7 @@ const NUMBERS_CSV_PATH = path.join(__dirname, "../data/numbers.csv");
 const SONGS_CSV_PATH = path.join(__dirname, "../data/songs.csv");
 
 test("parseCSV yields arrays", async () => {
-  const results = await parseCSV(PEOPLE_CSV_PATH)
+  const results = await parseCSV<string[]>(PEOPLE_CSV_PATH, undefined)
   
   expect(results).toHaveLength(5);
   expect(results[0]).toEqual(["name", "age"]);
@@ -19,23 +20,24 @@ test("parseCSV yields arrays", async () => {
 });
 
 test("parseCSV yields only arrays", async () => {
-  const results = await parseCSV(PEOPLE_CSV_PATH)
+  const results = await parseCSV<string[]>(PEOPLE_CSV_PATH, undefined)
   for(const row of results) {
     expect(Array.isArray(row)).toBe(true);
   }
 });
 
 test("parseCSV splits csv data properly", async () => {
-  const results = await parseCSV(PEOPLE_CSV_PATH)
-
+  const results = await parseCSV<string[]>(PEOPLE_CSV_PATH, undefined) as string[][];
+  
   expect(results[0][0]).toEqual("name");
   expect(results[0][1]).toEqual("age");
   expect(results[1][0]).toEqual("Alice");
   expect(results[1][1]).toEqual("23");
+  
 })
 
 test("parseCSV can parse csvs with missing columns (no ,,)", async () => {
-  const results = await parseCSV(NUMBERS_CSV_PATH);
+  const results = await parseCSV<string[]>(NUMBERS_CSV_PATH, undefined);
   
   expect(results[0]).toEqual(["1", ""]);
   expect(results[1]).toEqual(["2,", "4.23"]);
@@ -44,7 +46,7 @@ test("parseCSV can parse csvs with missing columns (no ,,)", async () => {
 })
 
 test("parseCSV quotation errors test", async () => {
-  const results = await parseCSV(SONGS_CSV_PATH);
+  const results = await parseCSV<string[]>(SONGS_CSV_PATH, undefined) as string[][];
   expect(results[0][0]).toEqual("aespa");
   expect(results[0][1]).toEqual("i said \"mom, i am a rich man!\" imma carry myself"); // what do i expect??
   expect(results[1][0]).toEqual("FIFTY FIFTY");
@@ -54,7 +56,7 @@ test("parseCSV quotation errors test", async () => {
 })
 
 test("parseCSV can successfully parse csvs with empty columns (with ,,)", async () => {
-  const results = await parseCSV(EXAMS_CSV_PATH)
+  const results = await parseCSV<string[]>(EXAMS_CSV_PATH, undefined) as string[][]
 
   expect(results).toHaveLength(6);
 
@@ -80,7 +82,7 @@ test("parseCSV can successfully parse csvs with empty columns (with ,,)", async 
 });
 
 test("parseCSV groups strings that are wrapped with quotations", async () => {
-  const results = await parseCSV(QUOTES_CSV_PATH)
+  const results = await parseCSV<string[]>(QUOTES_CSV_PATH, undefined);
   
   expect(results).toHaveLength(4);
   expect(results[1][0]).toEqual("Oscar Wilde");
@@ -96,3 +98,21 @@ test("parseCSV groups strings that are wrapped with quotations", async () => {
   expect(results[4][1]).toEqual("I am free of all prejudice. I hate everyone equally.");
 });
 
+test("parseCSV with schema", async () => {
+  const peopleSchema = z.tuple([z.string(), z.string()]);
+  const results = await parseCSV<string[]>(PEOPLE_CSV_PATH, peopleSchema);
+
+  expect(results[0]).toEqual(["name", "age"]);
+  expect(results[1]).toEqual(["Alice", "23"]);
+  expect(results[2]).toEqual(["Bob", "thirty"]);
+  expect(results[3]).toEqual(["Charlie", "25"]);
+  expect(results[4]).toEqual(["Nim", "22"]);
+
+});
+
+test("parseCSV with schema mismatch", async () => {
+  const wrongPeopleSchema = z.string();
+  await expect(parseCSV(PEOPLE_CSV_PATH, wrongPeopleSchema)).rejects.toThrow();
+});
+
+test("parseCSV ")
