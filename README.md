@@ -94,7 +94,9 @@
     I resonated with the ones that I also came up with and the ones catching edge cases like handling line endings. I did not resonate with ones like multi-character delimiters or inferring types from the data without 
 
 ### Design Choices
-    I made parserCSV accept the schema and validate the rows if the schema is not undefined. If the schema is undefined, the function will parse 
+    I made parserCSV accept the schema and validate the rows if the schema is not undefined. If the schema is undefined, the function will parse the CSV file and return a string[][]. If there is a given schema, the parseCSV will validate and transform the parsed data accordingly. If while parsing there is an error, the parser will throw an error.
+
+    The error points to what row it encountered an error. 
 
 ### 1340 Supplement
     N/A
@@ -107,20 +109,45 @@
         handle errors gracefully and report them to users clearly
         
 - #### 2. Random, On-Demand Generation
-    I think this would help test more rapidly and thoroughly if configured correctly. 
+    I think this would help test more rapidly and thoroughly by being able to simulate random errors that CSV files could have. It can help capture variations of CSV files that I couldn't think of.
 
 - #### 3. Overall experience, Bugs encountered and resolved
 #### Errors/Bugs:
-    Setting the return type with T[] caused the results to potentially be unknown, which hindered testing and making the 
+    I couldn't figure out the error object part so I unfortunately compromised by throwing an error.
+    So if you try to test using a CSV file that's partially incomplete, the parser will throw an error.
+
+    If the header does not follow the given schema, it will throw an error.
+
 #### Tests:
+    1. "parseCSV splits csv data properly"
+        Verifies that the parseCSV divides the row of CSV file by the delimiter.
+    2. "parseCSV can parse csvs with missing columns (no ,,)"
+        Tests if parseCSV can parse csvs with missing columns (empty values).
+    3. "parseCSV quotation errors test"
+        Tests quotation rules (escape quotes, multiple quotations).
+    4. "parseCSV can successfully parse csvs with empty columns (with ,,)"
+        Tests if parse CSV can parse csvs with missing columns that are marked with commas right next to each other.
+    5. "parseCSV groups strings that are wrapped with quotations"
+        Tests quotation rules (group words in between quotations)
+    6. "parseCSV with schema"
+        Basic test that tests whether passing in a schema to the parser produces expected results
+    7. "parseCSV with schema mismatch"
+        Tests whether parser catches schema mismatch and throws an error accordingly
+    8. "parseCSV schema with correct coercion"
+        Tests passing in a schema that involves coercion
+        
 #### How To…
+    Run tests: npm run test
+    Run run-parser.ts: npm run run
 
 #### Team members and contributions (include cs logins):
     N/A
 #### Collaborators (cslogins of anyone you worked with on this project and/or generative AI):
-    ChatGPT for Task B & C. I asked it to explain generics and ways to use it to supplement the reading to recall last year's learning better. I also used it for base level brainstorming for coming up with ways to alert the user of errors without using the console logs.
+    ChatGPT for Task B & C. I asked it to explain generics and ways to use it to supplement the reading to recall last year's learning better. I also used it for base level brainstorming for coming up with ways to alert the user of errors without using the console logs. I asked it to explain regex.
+
+    I debugged my bug above with the help of Copilot (it told me to specify generics in <> when calling the function).
 
 #### Total estimated time it took to complete project:
-    7 hours
+    8 hours
 #### Link to GitHub Repo:  
     https://github.com/cs0320-f25/typescript-csv-jessiiishin

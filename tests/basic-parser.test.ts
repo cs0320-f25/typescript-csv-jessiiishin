@@ -7,6 +7,7 @@ const EXAMS_CSV_PATH = path.join(__dirname, "../data/exams.csv");
 const QUOTES_CSV_PATH = path.join(__dirname, "../data/quotes.csv");
 const NUMBERS_CSV_PATH = path.join(__dirname, "../data/numbers.csv");
 const SONGS_CSV_PATH = path.join(__dirname, "../data/songs.csv");
+const GOODNUMBERS_CSV_PATH = path.join(__dirname, "../data/goodnumbers.csv");
 
 test("parseCSV yields arrays", async () => {
   const results = await parseCSV<string[]>(PEOPLE_CSV_PATH, undefined)
@@ -40,15 +41,16 @@ test("parseCSV can parse csvs with missing columns (no ,,)", async () => {
   const results = await parseCSV<string[]>(NUMBERS_CSV_PATH, undefined);
   
   expect(results[0]).toEqual(["1", ""]);
-  expect(results[1]).toEqual(["2,", "4.23"]);
-  expect(results[2]).toEqual(["10", ""]); // what would i expect?
-  expect(results[3]).toEqual(["1.0", ""]); // what would i expect?
+  expect(results[1]).toEqual(["2", "4.23"]);
+  expect(results[2]).toEqual(["10"]); 
+  expect(results[3]).toEqual(["1.0"]);
 })
 
 test("parseCSV quotation errors test", async () => {
   const results = await parseCSV<string[]>(SONGS_CSV_PATH, undefined) as string[][];
+  
   expect(results[0][0]).toEqual("aespa");
-  expect(results[0][1]).toEqual("i said \"mom, i am a rich man!\" imma carry myself"); // what do i expect??
+  expect(results[0][1]).toEqual("i said \"mom, i am a rich man!\" imma carry myself");
   expect(results[1][0]).toEqual("FIFTY FIFTY");
   expect(results[2][1]).toEqual("0:01 \"i trip and fall\" in love");
   expect(results[3][1]).toEqual("0:37 'you push and pull me like gravity'");
@@ -99,8 +101,8 @@ test("parseCSV groups strings that are wrapped with quotations", async () => {
 });
 
 test("parseCSV with schema", async () => {
-  const peopleSchema = z.tuple([z.string(), z.string()]);
-  const results = await parseCSV<string[]>(PEOPLE_CSV_PATH, peopleSchema);
+  const twoStringSchema = z.tuple([z.string(), z.string()]);
+  const results = await parseCSV<string[]>(PEOPLE_CSV_PATH, twoStringSchema);
 
   expect(results[0]).toEqual(["name", "age"]);
   expect(results[1]).toEqual(["Alice", "23"]);
@@ -108,11 +110,35 @@ test("parseCSV with schema", async () => {
   expect(results[3]).toEqual(["Charlie", "25"]);
   expect(results[4]).toEqual(["Nim", "22"]);
 
+  const results2 = await parseCSV<string[]>(QUOTES_CSV_PATH, twoStringSchema);
+
+  expect(results2[0]).toEqual(["name", "quote"]);
+  expect(results2[1]).toEqual(["Oscar Wilde", "Be yourself; everyone else is already taken."]);
+  expect(results2[2]).toEqual(["Frank Zappa", "So many books, so little time"]);
+  expect(results2[3]).toEqual(["W.C. Fields", "I am free of all prejudice. I hate everyone equally."]);
+
 });
 
 test("parseCSV with schema mismatch", async () => {
   const wrongPeopleSchema = z.string();
   await expect(parseCSV(PEOPLE_CSV_PATH, wrongPeopleSchema)).rejects.toThrow();
+
+  // empty values (with ,,)
+  const examSchema = z.tuple([z.string(), z.string(), z.coerce.number()]);
+  await expect(parseCSV(EXAMS_CSV_PATH, examSchema)).rejects.toThrow();
+
+  // empty values (no ,,)
+  const numberSchema = z.tuple([z.coerce.number(), z.coerce.number()]);
+  await expect(parseCSV(NUMBERS_CSV_PATH, numberSchema)).rejects.toThrow();
 });
 
-test("parseCSV ")
+test("parseCSV schema with correct coercion", async () => {
+  const numberSchema = z.tuple([z.string(), z.coerce.number()]);
+  const numResults = await parseCSV<[string, number]>(GOODNUMBERS_CSV_PATH, numberSchema);
+  
+  expect(numResults[0]).toEqual(["happy", 10]);
+  expect(numResults[1]).toEqual(["feeling", 22]);
+  expect(numResults[2]).toEqual(["thanks", 100]);
+  expect(numResults[3]).toEqual(["no", 9]);
+  expect(numResults[4]).toEqual(["brown", 19]);
+});
