@@ -91,12 +91,14 @@
 
     My initial ideas were basically quotation rules (1), type inference and specification (2), handling bad inputs (3), and validation of data types (2). The LLM suggested a whole bunch of ideas (listed in step 2). The more detailed instructions I provided, the more suggestions it returned. Many of the suggestions were the same across the different sessions, and the clarifying questions were always the same but rephrased in different ways.
 
-    I resonated with the ones that I also came up with and the ones catching edge cases like handling line endings. I did not resonate with ones like multi-character delimiters or inferring types from the data without 
+    I resonated with the ones that I also came up with and the ones catching edge cases like handling line endings. I did not resonate with ones like multi-character delimiters or inferring types from the data automatically. 
+    For instance, I feel like if the parser automatically infers a string like "10" as the number 10, it might interfere with what the user actually wants.
 
 ### Design Choices
     I made parserCSV accept the schema and validate the rows if the schema is not undefined. If the schema is undefined, the function will parse the CSV file and return a string[][]. If there is a given schema, the parseCSV will validate and transform the parsed data accordingly. If while parsing there is an error, the parser will throw an error.
 
-    The error points to what row it encountered an error. 
+    The error points to what row it encountered the error so that the users can know where to look.
+        (I WANTED to expand on this and return a error object instead. In an ideal world, it would amass all the invalid row numbers and return them while also returning the successful results... but I couldn't figure it out).
 
 ### 1340 Supplement
     N/A
@@ -106,7 +108,7 @@
         return what is in the CSV file without false omission or alteration
         split up data on the delimiter
         handle data that's grouped in double quotations (or other notation)
-        handle errors gracefully and report them to users clearly
+        handle errors gracefully and report them to users clearl.
         
 - #### 2. Random, On-Demand Generation
     I think this would help test more rapidly and thoroughly by being able to simulate random errors that CSV files could have. It can help capture variations of CSV files that I couldn't think of.
@@ -116,7 +118,7 @@
     I couldn't figure out the error object part so I unfortunately compromised by throwing an error.
     So if you try to test using a CSV file that's partially incomplete, the parser will throw an error.
 
-    If the header does not follow the given schema, it will throw an error.
+    If the header does not follow the given schema, it will throw an error because of how the parser validates every single line. This makes it so that the parser throws an error even if all the other rows are valid.
 
 #### Tests:
     1. "parseCSV splits csv data properly"
