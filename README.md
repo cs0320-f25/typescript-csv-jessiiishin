@@ -111,7 +111,7 @@
 #### Team members and contributions (include cs logins):
 
 #### Collaborators (cslogins of anyone you worked with on this project and/or generative AI):
-    ChatGPT for Task B.
+    ChatGPT for Task B & C. I asked it to explain generics and ways to use it to supplement the reading to recall last year's learning better. I also used it for base level brainstorming for coming up with ways to alert the user of errors without using the console logs.
 
 #### Total estimated time it took to complete project:
     5 hours
